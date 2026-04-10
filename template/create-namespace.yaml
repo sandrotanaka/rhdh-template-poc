@@ -27,7 +27,7 @@ spec:
     - id: publish
       action: publish:github
       input:
-        repoUrl: github.com?owner=sandrotanaka&repo=gitops-poc
+        repoUrl: github.com?owner=sandrotanaka&repo=rhdh-template-poc
         defaultBranch: main
         sourcePath: .
         gitCommitMessage: "create project ${{ parameters.projectName }}"
