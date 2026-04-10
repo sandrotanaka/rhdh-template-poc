@@ -4,7 +4,8 @@ metadata:
   name: poc-openshift-project
   title: Criar projeto OpenShift (PoC)
 spec:
-  owner: user:guest
+  #owner: user:guest
+  owner: group:default/platform-team
   type: service
 
   parameters:
