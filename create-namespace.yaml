@@ -4,7 +4,6 @@ metadata:
   name: poc-openshift-project
   title: Criar projeto OpenShift (PoC)
 spec:
-  #owner: user:guest
   owner: group:default/platform-team
   type: service
 
@@ -16,9 +15,11 @@ spec:
         projectName:
           title: Nome do projeto
           type: string
+          pattern: '^[a-z0-9]([-a-z0-9]*[a-z0-9])?$'
 
   steps:
-    - id: fetch
+    - id: fetch-base
+      name: Gerar manifesto
       action: fetch:template
       input:
         url: ./skeleton
@@ -26,9 +27,10 @@ spec:
           projectName: ${{ parameters.projectName }}
 
     - id: publish
-      action: publish:github
+      name: Criar PR no GitOps
+      action: publish:github:pull-request
       input:
         repoUrl: github.com?owner=sandrotanaka&repo=devhub-demo
-        defaultBranch: main
-        sourcePath: .
-        gitCommitMessage: "create project ${{ parameters.projectName }}"
+        branchName: create-${{ parameters.projectName }}
+        title: create project ${{ parameters.projectName }}
+        description: Cria namespace ${{ parameters.projectName }} via GitOps
