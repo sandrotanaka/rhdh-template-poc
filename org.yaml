@@ -1,0 +1,8 @@
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: platform-team
+  description: Grupo responsável pelos templates da PoC
+spec:
+  type: team
+  children: []
