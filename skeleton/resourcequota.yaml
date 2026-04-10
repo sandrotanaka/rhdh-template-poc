@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: compute-quota
+  namespace: ${{ values.projectName }}
+spec:
+  hard:
+    requests.cpu: "${{ values.quotaRequestsCpu }}"
+    requests.memory: "${{ values.quotaRequestsMemory }}"
+    limits.cpu: "${{ values.quotaLimitsCpu }}"
+    limits.memory: "${{ values.quotaLimitsMemory }}"
+    pods: "${{ values.quotaPods }}"
