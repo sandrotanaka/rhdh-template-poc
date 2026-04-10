@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: default-limits
+  namespace: ${{ values.projectName }}
+spec:
+  limits:
+    - type: Container
+      default:
+        cpu: "${{ values.defaultCpu }}"
+        memory: "${{ values.defaultMemory }}"
+      defaultRequest:
+        cpu: "${{ values.defaultRequestCpu }}"
+        memory: "${{ values.defaultRequestMemory }}"
