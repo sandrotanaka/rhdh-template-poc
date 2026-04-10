@@ -1,0 +1,33 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: poc-openshift-project
+  title: Criar projeto OpenShift (PoC)
+spec:
+  owner: user:guest
+  type: service
+
+  parameters:
+    - title: Dados
+      required:
+        - projectName
+      properties:
+        projectName:
+          title: Nome do projeto
+          type: string
+
+  steps:
+    - id: fetch
+      action: fetch:template
+      input:
+        url: ./skeleton
+        values:
+          projectName: ${{ parameters.projectName }}
+
+    - id: publish
+      action: publish:github
+      input:
+        repoUrl: github.com?owner=sandrotanaka&repo=rhdh-template-poc
+        defaultBranch: main
+        sourcePath: .
+        gitCommitMessage: "create project ${{ parameters.projectName }}"
