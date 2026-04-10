@@ -3,6 +3,8 @@ kind: ResourceQuota
 metadata:
   name: compute-quota
   namespace: ${{ values.projectName }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   hard:
     requests.cpu: "${{ values.quotaRequestsCpu }}"
