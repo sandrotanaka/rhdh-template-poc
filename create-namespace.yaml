@@ -18,16 +18,17 @@ spec:
           pattern: '^[a-z0-9]([-a-z0-9]*[a-z0-9])?$'
 
   steps:
-    - id: fetch-base
+    - id: fetch
       name: Gerar manifesto
       action: fetch:template
       input:
         url: ./skeleton
+        targetPath: ./clusters/dev/projects/${{ parameters.projectName }}
         values:
           projectName: ${{ parameters.projectName }}
 
-    - id: publish
-      name: Criar PR no GitOps
+    - id: pr
+      name: Criar pull request no GitOps
       action: publish:github:pull-request
       input:
         repoUrl: github.com?owner=sandrotanaka&repo=devhub-demo
