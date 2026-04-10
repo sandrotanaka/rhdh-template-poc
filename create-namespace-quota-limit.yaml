@@ -1,0 +1,88 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: poc-openshift-namespace-quota-limit
+  title: Criar namespace com quotas e limites
+  description: Cria namespace, ResourceQuota e LimitRange via GitOps
+spec:
+  owner: group:default/platform-team
+  type: service
+
+  parameters:
+    - title: Dados do namespace
+      required:
+        - projectName
+      properties:
+        projectName:
+          title: Nome do namespace
+          type: string
+          pattern: '^[a-z0-9]([-a-z0-9]*[a-z0-9])?$'
+        quotaRequestsCpu:
+          title: Quota requests.cpu
+          type: string
+          default: "2"
+        quotaRequestsMemory:
+          title: Quota requests.memory
+          type: string
+          default: "4Gi"
+        quotaLimitsCpu:
+          title: Quota limits.cpu
+          type: string
+          default: "4"
+        quotaLimitsMemory:
+          title: Quota limits.memory
+          type: string
+          default: "8Gi"
+        quotaPods:
+          title: Quota pods
+          type: string
+          default: "20"
+        defaultCpu:
+          title: LimitRange CPU default
+          type: string
+          default: "500m"
+        defaultMemory:
+          title: LimitRange memória default
+          type: string
+          default: "512Mi"
+        defaultRequestCpu:
+          title: LimitRange CPU request default
+          type: string
+          default: "250m"
+        defaultRequestMemory:
+          title: LimitRange memória request default
+          type: string
+          default: "256Mi"
+
+  steps:
+    - id: fetch
+      name: Gerar manifestos
+      action: fetch:template
+      input:
+        url: ./skeleton
+        targetPath: ./clusters/dev/projects/${{ parameters.projectName }}
+        values:
+          projectName: ${{ parameters.projectName }}
+          quotaRequestsCpu: ${{ parameters.quotaRequestsCpu }}
+          quotaRequestsMemory: ${{ parameters.quotaRequestsMemory }}
+          quotaLimitsCpu: ${{ parameters.quotaLimitsCpu }}
+          quotaLimitsMemory: ${{ parameters.quotaLimitsMemory }}
+          quotaPods: ${{ parameters.quotaPods }}
+          defaultCpu: ${{ parameters.defaultCpu }}
+          defaultMemory: ${{ parameters.defaultMemory }}
+          defaultRequestCpu: ${{ parameters.defaultRequestCpu }}
+          defaultRequestMemory: ${{ parameters.defaultRequestMemory }}
+
+    - id: pr
+      name: Criar pull request no GitOps
+      action: publish:github:pull-request
+      input:
+        repoUrl: github.com?owner=sandrotanaka&repo=devhub-demo
+        branchName: create-${{ parameters.projectName }}
+        title: create project ${{ parameters.projectName }}
+        description: Cria namespace, ResourceQuota e LimitRange para ${{ parameters.projectName }}
+
+  output:
+    links:
+      - title: Pull Request
+        url: ${{ steps.pr.output.remoteUrl }}
