@@ -1,0 +1,45 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: ansible-job-http-test
+  title: Teste Ansible via HTTP
+  description: Executa um Job Template do Ansible Automation Platform via proxy do Backstage
+spec:
+  owner: platform-team
+  type: service
+
+  parameters:
+    - title: Parâmetros do Job
+      required:
+        - jobTemplateId
+      properties:
+        jobTemplateId:
+          title: ID do Job Template
+          type: string
+          description: Exemplo 42
+
+        mensagem:
+          title: Mensagem de teste
+          type: string
+          default: hello-from-rhdh
+
+  steps:
+    - id: launch-job
+      name: Disparando Job Template no Ansible
+      action: http:backstage:request
+      input:
+        method: POST
+        path: /proxy/aap/api/controller/v2/job_templates/${{ parameters.jobTemplateId }}/launch/
+        headers:
+          Content-Type: application/json
+          Accept: application/json
+        body:
+          extra_vars:
+            mensagem: '${{ parameters.mensagem }}'
+
+  output:
+    text:
+      - title: Resultado
+        content: |
+          Resposta da API:
+          ${{ steps['launch-job'].output.body }}
