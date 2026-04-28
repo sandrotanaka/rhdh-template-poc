@@ -1,0 +1,85 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: create-db-via-sp
+  title: Solicitação de Banco de Dados (Stored Procedure)
+  description: Executa a procedure prcontrole..cria_banco via Ansible Automation Platform
+spec:
+  owner: platform-team
+  type: service
+
+  parameters:
+    - title: Parâmetros do Job
+      required:
+        - jobTemplateId
+        - requisicao
+        - ambiente
+        - nome_cliente
+        - nome_sistema
+      properties:
+        jobTemplateId:
+          title: ID do Job Template
+          type: string
+          description: Exemplo 42
+
+        requisicao:
+          title: ID da Requisição
+          type: string
+          description: Exemplo REQ123
+
+        ambiente:
+          title: Ambiente
+          type: string
+          enum: ['L','D', 'H', 'P']
+          enumNames: ['Laboratório','Desenvolvimento', 'Homologação', 'Produção']
+          default: 'L'
+
+        nome_cliente:
+          title: Nome do Cliente
+          type: string
+
+        nome_sistema:
+          title: Nome do Sistema
+          type: string
+
+        sufixo:
+          title: Sufixo Opcional
+          type: string
+          default: 'NONE'
+
+  steps:
+    - id: launch-job
+      name: Disparando Job Template no Ansible
+      action: http:backstage:request
+      input:
+        method: POST
+        path: /proxy/aap/api/controller/v2/job_templates/${{ parameters.jobTemplateId }}/launch/
+        headers:
+          Content-Type: application/json
+          Accept: application/json
+        body:
+          extra_vars:
+            requisicao: '${{ parameters.requisicao }}'
+            ambiente: '${{ parameters.ambiente }}'
+            nome_cliente: '${{ parameters.nome_cliente }}'
+            nome_sistema: '${{ parameters.nome_sistema }}'
+            sufixo: '${{ parameters.sufixo }}'
+
+    - id: log-message
+      name: Finalizar
+      action: debug:log
+      input:
+        message: |
+          Solicitação enviada com sucesso!
+          Sistema: ${{ parameters.nome_sistema }}
+          Cliente: ${{ parameters.nome_cliente }}
+          Ambiente: ${{ parameters.ambiente }}
+
+  output:
+    text:
+      - title: Resultado
+        content: |
+          Job Template ID: ${{ parameters.jobTemplateId }}
+
+          Resposta da API:
+          ${{ steps['launch-job'].output.body }}
